@@ -19,6 +19,11 @@ const optionsArr = [
     },
 ];
 
+var fakeArr = [1, 2, 3, 4, 5,];
+var deptsArr = [];
+var rolesArr = [];
+var mngrArr = [];
+
 function optionSwitch(choice) {
     switch (choice) {
         case 'View All Departments':
@@ -63,7 +68,7 @@ const functArr = [
             {
                 type: 'input',
                 message: `What is the name of the department?`,
-                name: 'newEntry',
+                name: 'deptName',
             },
         )
         .then((answers) => {
@@ -71,22 +76,57 @@ const functArr = [
         })
     },
     function addRole() {
-        inquirer.prompt(
+        // getDepts();
+        // I think I need to promisify this to get the array to load properly.
+        inquirer.prompt([
             {
                 type: 'input',
                 message: `What is the name of the role?`,
-                name: 'newEntry',
-            }
-        )
+                name: 'roleName',
+            },
+            {
+                type: 'number',
+                message: `What is the salary for this role?`,
+                name: 'roleSal',
+            },
+            {
+                // According to the video, we should choose from a the list of current departments. The readme says that this should be an integer that corresponds to that value. How would we do that?
+                type: 'list',
+                message: `What department does this role fall under?`,
+                choices: deptsArr,
+                name: 'roleDept',
+            },
+        ])
+        .then((answers) => {
+            newRole(answers)
+        })
     },
     function addEmp() {
-        inquirer.prompt(
+        inquirer.prompt([
             {
                 type: 'input',
-                message: `What is the employee's name?`,
-                name: 'newEntry',
-            }
-        )
+                message: `What is this employee's first name?`,
+                name: 'firstName',
+            },
+            {
+                type: 'input',
+                message: `What is this employee's last name?`,
+                name: 'lastName',
+            },
+            {
+                type: 'input',
+                message: `What is this employee's role?`,
+                name: 'empRole',
+            },
+            {
+                type: 'input',
+                message: `Who is this employee's manager?`,
+                name: 'empMngr',
+            },
+        ])
+        .then((answers) => {
+            newEmp(answers)
+        })
     },
     function updateEmp() {
         console.log('Updating an Employee Role.');
@@ -96,13 +136,41 @@ const functArr = [
     },
 ];
 
+function getDepts() {
+    db.query(`SELECT * FROM department;`, (err, results) => {
+        if (err) {
+            console.log(err)
+        } else {
+            deptsArr = [];
+            var roleReturn = results;
+            for (const role of roleReturn) {
+                deptsArr.push(role.name);
+            }
+        }
+        // console.log(deptsArr);
+    });
+};
+
 function newDept(data) {
-    db.query(`INSERT INTO department VALUES (?)`, data)
-    // renderTable('department');
+    let deptVar = data.deptName;
+    db.query(`INSERT INTO department (name) VALUES (?);`, deptVar)
+    renderTable('department');
+};
+
+function newRole(data) {
+    let { roleName, roleSal, roleDept } = data;
+    db.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?);`, [roleName, roleSal, roleDept]);
+    renderTable('role');
+};
+
+function newEmp(data) {
+    let { firstName, lastName, empRole, empMngr } = data;
+    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);`, [firstName, lastName, empRole, empMngr]);
+    renderTable('role');
 };
 
 function renderTable(table) {
-    db.query(`SELECT * FROM ??`, table, (err, results) => {
+    db.query(`SELECT * FROM ??;`, table, (err, results) => {
         if (err) {
             console.error(err);
         }
@@ -111,6 +179,8 @@ function renderTable(table) {
 };
 
 function init() {
+    // This is here as a hack because I couldn't get the asynchronocity to work in the function call of getDepts.
+    getDepts();
     inquirer.prompt(optionsArr)
     .then((answers) => {
         optionSwitch(answers.optionSelect);
