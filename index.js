@@ -1,6 +1,15 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 
+const db = mysql.createConnection(
+    {
+        host: 'localhost',
+        user: 'root',
+        password: 'RootRoot',
+        database: 'a12_Staff'
+    },
+);
+
 const optionsArr = [
     {
         type: 'list',
@@ -22,19 +31,19 @@ function optionSwitch(choice) {
             functArr[0]('employee');
             break;
         case 'Add a Department':
-            functArr[1]('department');
+            functArr[1]();
             break;
         case 'Add a Role':
-            functArr[1]('role');
-            break;
-        case 'Add an Employee':
-            functArr[1]('employee');
-            break;
-        case 'Update an Employee Role':
             functArr[2]();
             break;
-        case 'Terminate Application':
+        case 'Add an Employee':
             functArr[3]();
+            break;
+        case 'Update an Employee Role':
+            functArr[4]();
+            break;
+        case 'Terminate Application':
+            functArr[5]();
             break;
     }
 };
@@ -49,15 +58,36 @@ const functArr = [
             console.log(results);
         })
     },
-    function addEl(choice) {
+    function addDept() {
         inquirer.prompt(
             {
                 type: 'input',
-                message: `What is the name of the ${choice}?`,
+                message: `What is the name of the department?`,
+                name: 'newEntry',
+            },
+        )
+        .then((answers) => {
+            newDept(answers);
+        })
+    },
+    function addRole() {
+        inquirer.prompt(
+            {
+                type: 'input',
+                message: `What is the name of the role?`,
                 name: 'newEntry',
             }
-        );
-    },    
+        )
+    },
+    function addEmp() {
+        inquirer.prompt(
+            {
+                type: 'input',
+                message: `What is the employee's name?`,
+                name: 'newEntry',
+            }
+        )
+    },
     function updateEmp() {
         console.log('Updating an Employee Role.');
     },
@@ -66,14 +96,19 @@ const functArr = [
     },
 ];
 
-const db = mysql.createConnection(
-    {
-        host: 'localhost',
-        user: 'root',
-        password: 'RootRoot',
-        database: 'a12_Staff'
-    },
-);
+function newDept(data) {
+    db.query(`INSERT INTO department VALUES (?)`, data)
+    // renderTable('department');
+};
+
+function renderTable(table) {
+    db.query(`SELECT * FROM ??`, table, (err, results) => {
+        if (err) {
+            console.error(err);
+        }
+        console.log(results);
+    })
+};
 
 function init() {
     inquirer.prompt(optionsArr)
