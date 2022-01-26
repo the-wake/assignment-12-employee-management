@@ -1,5 +1,6 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
+const cTable = require('console.table');
 
 const db = mysql.createConnection(
     {
@@ -39,7 +40,7 @@ function optionSwitch(choice) {
             functArr[1]();
             break;
         case 'Add a Role':
-            functArr[2]();
+            getDepts();
             break;
         case 'Add an Employee':
             functArr[3]();
@@ -76,8 +77,6 @@ const functArr = [
         })
     },
     function addRole() {
-        // getDepts();
-        // I think I need to promisify this to get the array to load properly.
         inquirer.prompt([
             {
                 type: 'input',
@@ -90,7 +89,6 @@ const functArr = [
                 name: 'roleSal',
             },
             {
-                // According to the video, we should choose from a the list of current departments. The readme says that this should be an integer that corresponds to that value. How would we do that?
                 type: 'list',
                 message: `What department does this role fall under?`,
                 choices: deptsArr,
@@ -98,7 +96,8 @@ const functArr = [
             },
         ])
         .then((answers) => {
-            newRole(answers)
+            newRole(answers);
+            // console.log(answers);
         })
     },
     function addEmp() {
@@ -144,10 +143,11 @@ function getDepts() {
             deptsArr = [];
             var roleReturn = results;
             for (const role of roleReturn) {
-                deptsArr.push(role.name);
+                deptsArr.push(`${role.id}:${role.name}`);
+                // console.log(deptsArr);
             }
+            functArr[2]();
         }
-        // console.log(deptsArr);
     });
 };
 
@@ -158,7 +158,10 @@ function newDept(data) {
 };
 
 function newRole(data) {
+    // console.log(data);
     let { roleName, roleSal, roleDept } = data;
+    roleDept = roleDept.split(":")[0];
+    console.log(roleDept);
     db.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?);`, [roleName, roleSal, roleDept]);
     renderTable('role');
 };
@@ -174,13 +177,11 @@ function renderTable(table) {
         if (err) {
             console.error(err);
         }
-        console.log(results);
+        console.table(results);
     })
 };
 
 function init() {
-    // This is here as a hack because I couldn't get the asynchronocity to work in the function call of getDepts.
-    getDepts();
     inquirer.prompt(optionsArr)
     .then((answers) => {
         optionSwitch(answers.optionSelect);
@@ -188,3 +189,4 @@ function init() {
 };
 
 init();
+// renderTable('employee');
