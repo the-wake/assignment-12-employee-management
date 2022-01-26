@@ -18,6 +18,10 @@
   },
   "homepage": "https://github.com/the-wake/assignment-12-employee-management#readme",
   "dependencies": {
-    "console.table": "^0.10.0"
+    "console.table": "^0.10.0",
+    "express": "^4.17.2",
+    "inquirer": "^8.2.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.3"
   }
 }
