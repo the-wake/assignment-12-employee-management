@@ -1,6 +1,9 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
+const app = require('express');
 const cTable = require('console.table');
+
+const optionArr = require('./lib/questions.js');
 
 const db = mysql.createConnection(
     {
@@ -11,19 +14,10 @@ const db = mysql.createConnection(
     },
 );
 
-const optionsArr = [
-    {
-        type: 'list',
-        message: 'Please select an option:',
-        choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add a Department', 'Add a Role', 'Add an Employee', 'Update an Employee Role', 'Terminate Application',],
-        name: 'optionSelect',
-    },
-];
-
-var fakeArr = [1, 2, 3, 4, 5,];
-var deptsArr = [];
-var rolesArr = [];
-var mngrArr = [];
+var fakeArr = ['1:Midrange', '2:Aggressive', '3:foo', '4:foo',];
+var deptsArr = ['1:foo', '1:food', '1:foods'];
+var rolesArr = ['1:foo', '1:food', '1:foods'];
+var empArr = ['1:foo', '1:food', '1:foods'];
 
 function optionSwitch(choice) {
     switch (choice) {
@@ -40,7 +34,7 @@ function optionSwitch(choice) {
             functArr[1]();
             break;
         case 'Add a Role':
-            getDepts();
+            functArr[2]();
             break;
         case 'Add an Employee':
             functArr[3]();
@@ -61,7 +55,7 @@ const functArr = [
             if (err) {
                 console.error(err);
             }
-            console.log(results);
+            console.table(results);
         })
     },
     function addDept() {
@@ -76,7 +70,10 @@ const functArr = [
             newDept(answers);
         })
     },
+    
     function addRole() {
+        // const validDepts = await getDepts()
+        // console.log(validDepts)
         inquirer.prompt([
             {
                 type: 'input',
@@ -91,14 +88,17 @@ const functArr = [
             {
                 type: 'list',
                 message: `What department does this role fall under?`,
-                choices: deptsArr,
+                choices: getDepts('data'),
                 name: 'roleDept',
             },
         ])
         .then((answers) => {
-            newRole(answers);
-            // console.log(answers);
-        })
+            newRole(answers)
+        });
+        // .then((answers) => {
+        //     newRole(answers);
+        //     // console.log(answers);
+        // })
     },
     function addEmp() {
         inquirer.prompt([
@@ -113,13 +113,15 @@ const functArr = [
                 name: 'lastName',
             },
             {
-                type: 'input',
+                type: 'list',
                 message: `What is this employee's role?`,
+                choices: rolesArr,
                 name: 'empRole',
             },
             {
-                type: 'input',
+                type: 'list',
                 message: `Who is this employee's manager?`,
+                choices: empArr,
                 name: 'empMngr',
             },
         ])
@@ -128,7 +130,23 @@ const functArr = [
         })
     },
     function updateEmp() {
-        console.log('Updating an Employee Role.');
+        inquirer.prompt([
+            {
+                type: 'list',
+                message: 'Which employee would you like to modify?',
+                choices: empArr,
+                name: 'chooseEmp',
+            },
+            {
+                type: 'list',
+                message: "Enter the employee's new role",
+                choices: rolesArr,
+                name: 'empRole',
+            }
+        ])
+        .then((answers) => {
+            changeEmp(answers);
+        })
     },
     function terminate() {
         console.log('Closing application...');
@@ -136,19 +154,19 @@ const functArr = [
 ];
 
 function getDepts() {
-    db.query(`SELECT * FROM department;`, (err, results) => {
-        if (err) {
-            console.log(err)
-        } else {
-            deptsArr = [];
-            var roleReturn = results;
-            for (const role of roleReturn) {
-                deptsArr.push(`${role.id}:${role.name}`);
-                // console.log(deptsArr);
-            }
-            functArr[2]();
-        }
-    });
+    // return [1,2,3]
+    db.query(`SELECT * FROM department;`, async (err, results) => {
+        var roleReturn = await results.map(({ id, name }) => ({ id: id, name: name }));
+        // console.log(roleReturn);
+        return roleReturn;
+        // deptsArr = [];
+        // for (const role of roleReturn) {
+        //     deptsArr.push(`${role.id}:${role.name}`);
+        // }
+        // functArr[2]();
+        // });
+        // }
+    })
 };
 
 function newDept(data) {
@@ -160,8 +178,8 @@ function newDept(data) {
 function newRole(data) {
     // console.log(data);
     let { roleName, roleSal, roleDept } = data;
-    roleDept = roleDept.split(":")[0];
     console.log(roleDept);
+    roleDept = roleDept.split(':')[0];
     db.query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?);`, [roleName, roleSal, roleDept]);
     renderTable('role');
 };
@@ -169,7 +187,16 @@ function newRole(data) {
 function newEmp(data) {
     let { firstName, lastName, empRole, empMngr } = data;
     db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);`, [firstName, lastName, empRole, empMngr]);
-    renderTable('role');
+    renderTable('employee');
+};
+
+// Need to make sure this one works.
+function changeEmp(data) {
+    let { chooseEmp, empRole} = data;
+    chooseEmp = empRole.split(':')[0];
+    empRole = empRole.split(':')[0];
+    db.query(`UPDATE employee SET manager_id = ? WHERE id = ?;`, [empRole, chooseEmp]);
+    renderTable('employee');
 };
 
 function renderTable(table) {
@@ -182,11 +209,11 @@ function renderTable(table) {
 };
 
 function init() {
-    inquirer.prompt(optionsArr)
+    inquirer.prompt(optionArr)
     .then((answers) => {
         optionSwitch(answers.optionSelect);
     })
 };
 
 init();
-// renderTable('employee');
+// getDepts();
