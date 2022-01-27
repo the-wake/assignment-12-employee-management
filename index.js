@@ -4,9 +4,8 @@ const app = require('express');
 const cTable = require('console.table');
 
 const db = require('./lib/db.js')
-// const optionArr = require('./lib/questions.js');
-const { createDept, createRole, createEmp, modifyEmp, terminate } = require('./lib/inquiries.js');
-// const { getDepts, getRoles, getEmps, newDept, newRole, newEmp, changeEmp, renderTable } = require('./lib/query-render.js');
+const { addDept, addRole, addEmp, updateEmp, terminate } = require('./lib/inquiries.js');
+const { getDepts, getRoles, getEmps } = require('./lib/query-render.js');
 
 var fakeArr = ['1:Midrange', '2:Aggressive', '3:foo', '4:foo',];
 var deptsArr = ['1:foo', '1:food', '1:foods'];
@@ -36,16 +35,16 @@ function optionSwitch(choice) {
             functArr[0]('employee');
             break;
         case 'Add a Department':    
-            createDept();
+            addDept();
             break;
         case 'Add a Role':
-            createRole();
+            addRole()
             break;
         case 'Add an Employee':
-            createEmp();
+            addEmp();
             break;
         case 'Update an Employee Role':
-            modifyEmp();
+            updateEmp();
             break;
         case 'Terminate Application':
             terminate();
@@ -61,7 +60,7 @@ function viewEl(choice) {
         }
         console.table(results);
     })
-}
+};
 
 
 function init() {
@@ -74,6 +73,10 @@ function init() {
 init();
 // getDepts();
 
+// TODO:
+// • Render results with console.table.
+// • Clear database.
+// • README and walkthrough video.
 
 
 
