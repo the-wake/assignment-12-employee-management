@@ -5,12 +5,8 @@ const cTable = require('console.table');
 
 const db = require('./lib/db.js')
 const { addDept, addRole, addEmp, updateEmp, terminate } = require('./lib/inquiries.js');
-const { getDepts, getRoles, getEmps } = require('./lib/query-render.js');
-
-var fakeArr = ['1:Midrange', '2:Aggressive', '3:foo', '4:foo',];
-var deptsArr = ['1:foo', '1:food', '1:foods'];
-var rolesArr = ['1:foo', '1:food', '1:foods'];
-var empArr = ['1:foo', '1:food', '1:foods'];
+const { setArr } = require('./lib/query-render.js');
+var { fakeArr, deptsArr, rolesArr, mngrsArr } = require('./lib/data.js')
 
 const optionArr = [
     {
@@ -21,24 +17,23 @@ const optionArr = [
     },
 ];
 
-module.exports = optionArr;
-
 function optionSwitch(choice) {
+    console.log(deptsArr);
     switch (choice) {
         case 'View All Departments':
             viewEl('department');
             break;
         case 'View All Roles':
-            functArr[0]('role');
+            viewEl('role');
             break;
         case 'View All Employees':
-            functArr[0]('employee');
+            viewEl('employee');
             break;
         case 'Add a Department':    
             addDept();
             break;
         case 'Add a Role':
-            addRole()
+            addRole();
             break;
         case 'Add an Employee':
             addEmp();
@@ -62,8 +57,30 @@ function viewEl(choice) {
     })
 };
 
-
 function init() {
+    setArr('deptsArr');
+    setArr('rolesArr');
+    setArr('mngrsArr');
+    console.log(deptsArr);
+    inquirer.prompt(
+        {
+            type: 'confirm',
+            message: 'Welcome! Would you like to run the team builder?',
+            name: 'initialize',
+        }
+    )
+    .then((init) => {
+        if (init.initialize) {
+            console.log('All right! Let\'s get started!')
+            newPrompt();
+        } else {
+            console.log('Have a nice day!')
+            process.exit();
+        }
+    })
+};
+
+function newPrompt() {
     inquirer.prompt(optionArr)
     .then((answers) => {
         optionSwitch(answers.optionSelect);
@@ -71,7 +88,11 @@ function init() {
 };
 
 init();
-// getDepts();
+// setArr('deptsArr');
+
+// addRole();
+
+module.exports = optionArr;
 
 // TODO:
 // • Render results with console.table.
