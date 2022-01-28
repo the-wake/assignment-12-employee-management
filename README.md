@@ -17,6 +17,8 @@ source schema.sql;
 ```
 If you wish, you may also use seeds.sql to populate the database with starter data. To initialize the database, you can run schema.sql again.
 
+[Demonstration video.](https://user-images.githubusercontent.com/56139228/151495372-c9b99026-0581-4d97-8b80-f7421e934d19.mp4)
+
 ## Usage
 Once installed, you can run *node index.js* to initialize the application. The user will be prompted to view, add, or update data from a main menu. These options will run various MySQL functions to manipulate and return data.
 
