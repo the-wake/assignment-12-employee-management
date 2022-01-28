@@ -6,4 +6,4 @@ SELECT * FROM employee
 INNER JOIN role
 ON employee.role_id=role.id;
 
-UPDATE employee SET role_id = 1 WHERE id = 7;
+UPDATE employee SET role_id = 1 WHERE id = 6;

@@ -1,4 +1,5 @@
 inst_assets
+.env
 
 # Logs
 logs
