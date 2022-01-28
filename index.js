@@ -14,6 +14,3 @@ function init(prompt) {
 }
 
 init(newPrompt);
-
-// TODO:
-// • README and walkthrough video.
