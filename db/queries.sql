@@ -1,2 +1,7 @@
-SELECT employee.first_name, employee.last_name, role.title, role.salary FROM employee
-JOIN role ON employee.role_id = role.id;
+SELECT * FROM role
+INNER JOIN department
+ON role.department_id=department.id;
+
+SELECT * FROM employee
+INNER JOIN role
+ON employee.role_id=role.id;
