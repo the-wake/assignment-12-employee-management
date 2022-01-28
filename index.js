@@ -7,7 +7,7 @@ const util = require('util');
 const db = require('./lib/db.js')
 const { addDept, addRole, addEmp, updateEmp, terminate } = require('./lib/inquiries.js');
 const { setArr, deptsArr } = require('./lib/query-render.js');
-// var { fakeArr, deptsArr, rolesArr, mngrsArr } = require('./lib/data.js')
+// var { fakeArr, deptsArr, rolesArr, empsArr } = require('./lib/data.js')
 
 const optionArr = [
     {
@@ -68,7 +68,7 @@ function viewEl(choice) {
 function init(prompt) {
     setArr('deptsArr');
     setArr('rolesArr');
-    setArr('mngrsArr');
+    setArr('empsArr');
     prompt();
 }
 
