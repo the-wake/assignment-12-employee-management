@@ -2,11 +2,12 @@ const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const app = require('express');
 const cTable = require('console.table');
+const util = require('util');
 
 const db = require('./lib/db.js')
 const { addDept, addRole, addEmp, updateEmp, terminate } = require('./lib/inquiries.js');
-const { setArr } = require('./lib/query-render.js');
-var { fakeArr, deptsArr, rolesArr, mngrsArr } = require('./lib/data.js')
+const { setArr, deptsArr } = require('./lib/query-render.js');
+// var { fakeArr, deptsArr, rolesArr, mngrsArr } = require('./lib/data.js')
 
 const optionArr = [
     {
@@ -18,7 +19,6 @@ const optionArr = [
 ];
 
 function optionSwitch(choice) {
-    console.log(deptsArr);
     switch (choice) {
         case 'View All Departments':
             viewEl('department');
@@ -57,37 +57,31 @@ function viewEl(choice) {
     })
 };
 
-function init() {
+
+// const initApp = util.promisify(init);
+
+// async function firstPrompt() {
+//     const proceed = await initApp();
+//     newPrompt();
+// }
+
+function init(prompt) {
     setArr('deptsArr');
     setArr('rolesArr');
     setArr('mngrsArr');
-    console.log(deptsArr);
-    inquirer.prompt(
-        {
-            type: 'confirm',
-            message: 'Welcome! Would you like to run the team builder?',
-            name: 'initialize',
-        }
-    )
-    .then((init) => {
-        if (init.initialize) {
-            console.log('All right! Let\'s get started!')
-            newPrompt();
-        } else {
-            console.log('Have a nice day!')
-            process.exit();
-        }
-    })
-};
+    prompt();
+
+}
 
 function newPrompt() {
+    // console.log(deptsArr);
     inquirer.prompt(optionArr)
     .then((answers) => {
         optionSwitch(answers.optionSelect);
     })
 };
 
-init();
+init(newPrompt);
 // setArr('deptsArr');
 
 // addRole();
@@ -102,6 +96,24 @@ module.exports = optionArr;
 
 
 
+    // console.log(deptsArr);
+    // inquirer.prompt(
+    //     {
+    //         type: 'confirm',
+    //         message: 'Welcome! Would you like to run the team builder?',
+    //         name: 'initialize',
+    //     }
+    // )
+    // .then((init) => {
+    //     if (init.initialize) {
+    //         console.log('All right! Let\'s get started!')
+    //         newPrompt();
+    //     } else {
+    //         console.log('Have a nice day!')
+    //         process.exit();
+    //     }
+    // })
+// };
 
 // const functArr = [
     // function addDept() {
