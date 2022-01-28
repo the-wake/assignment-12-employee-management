@@ -70,7 +70,6 @@ function init(prompt) {
     setArr('rolesArr');
     setArr('mngrsArr');
     prompt();
-
 }
 
 function newPrompt() {
